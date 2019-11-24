@@ -10,5 +10,4 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories
   "com.kite.wealfyservice.config"))
 @EnableJpaRepositories(basePackages = Array("com.kite.wealfyservice.repository"))
 @EntityScan(Array("com.kite.wealfyservice.entity"))
-class ApplicationConfig {
-}
+class ApplicationConfig

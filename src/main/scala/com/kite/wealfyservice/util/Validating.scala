@@ -13,6 +13,6 @@ trait Validating {
     implicitly[EntityValidator[T]]
       .validate(entity) match {
       case Right(_) => block
-      case Left(message) => throw EntityValidationException(message)
+      case Left(message) => throw new EntityValidationException(message)
     }
 }

@@ -10,7 +10,7 @@ class WebMvcConfig {
   @Bean
   def objectMapper: ObjectMapper = {
     new ObjectMapper()
-      .registerModule(DefaultScalaModule)
+      .registerModule(DefaultScalaModule) // because this is a Scala object
       .registerModule(new JavaTimeModule())
   }
 }
