@@ -2,6 +2,7 @@ plugins {
     id 'scala'
     id 'org.springframework.boot' version '2.1.7.RELEASE'
     id "io.spring.dependency-management" version "1.0.8.RELEASE"
+    id 'nu.studer.jooq' version '3.0.3'
 }
 
 group 'com.kite'
@@ -19,10 +20,14 @@ springBoot {
 
 dependencies {
     compile group: 'org.scala-lang', name: 'scala-library', version: '2.13.1'
-    compile "org.springframework.boot:spring-boot-starter-data-jpa"
     compile "org.springframework.boot:spring-boot-starter-web"
+
     compile "org.flywaydb:flyway-core"
+    compile "org.springframework.boot:spring-boot-starter-jooq"
+    compile group: 'org.jooq', name: 'jooq-scala_2.12', version: '3.12.3'
     compile group: "com.h2database", name: "h2", version: "1.4.199"
+    jooqRuntime group: "com.h2database", name: "h2", version: "1.4.199"
+
     compile group: "io.springfox", name: "springfox-swagger2", version :"2.9.2"
     compile group: "io.springfox", name: "springfox-swagger-ui", version: "2.9.2"
 
@@ -32,4 +37,48 @@ dependencies {
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.10.1'
     compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-scala_2.13', version: '2.10.1'
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.10.1'
+}
+
+jooq {
+    dao(sourceSets.main) {
+        jdbc {
+            driver = 'org.h2.Driver'
+            url = 'jdbc:h2:file:./wealfy'
+            user = 'app'
+            password = 'app'
+        }
+        generator {
+            name = 'org.jooq.codegen.DefaultGenerator'
+            strategy {
+                name = 'org.jooq.codegen.DefaultGeneratorStrategy'
+            }
+            database {
+                name = 'org.jooq.meta.h2.H2Database'
+                inputSchema = 'WEALFY'
+                /*forcedTypes {
+                    forcedType {
+                        name = 'varchar'
+                        expression = '.*'
+                        types = 'JSONB?'
+                    }
+                    forcedType {
+                        name = 'varchar'
+                        expression = '.*'
+                        types = 'INET'
+                    }
+                }*/
+            }
+            generate {
+                relations = true
+                deprecated = false
+                records = true
+                immutablePojos = true
+                fluentSetters = true
+            }
+            target {
+                packageName = 'com.kite.wealfy.jooq'
+                // directory = ...
+            }
+        }
+    }
 }
