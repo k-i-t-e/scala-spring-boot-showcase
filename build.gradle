@@ -38,6 +38,9 @@ dependencies {
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.10.1'
     compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-scala_2.13', version: '2.10.1'
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.10.1'
+
+    // shapeless
+    compile group: 'com.chuusai', name: 'shapeless_2.13', version: '2.3.3'
 }
 
 flyway {

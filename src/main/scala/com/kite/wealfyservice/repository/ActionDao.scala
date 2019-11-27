@@ -1,25 +1,19 @@
 package com.kite.wealfyservice.repository
 
-import com.kite.wealfy.jooq.Tables
-import com.kite.wealfy.jooq.tables.{Action, Category}
 import com.kite.wealfy.jooq.tables.Action.ACTION
 import com.kite.wealfy.jooq.tables.Category._
-import com.kite.wealfy.jooq.tables.records.ActionRecord
-import com.kite.wealfyservice.entity.ActionDto
-
-import scala.jdk.CollectionConverters._
-import org.jooq._
-import org.jooq.impl._
-import org.jooq.impl.DSL._
-import org.jooq.scalaextensions.Conversions._
+import com.kite.wealfyservice.entity.{ActionDto, Category}
 import org.jooq.DSLContext
+import org.jooq.scalaextensions.Conversions._
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Repository
 
+import scala.jdk.CollectionConverters._
+
 @Repository
 class ActionDao @Autowired() (private val DSLContext: DSLContext){
-  def findAll() = {
-    val a = (DSLContext
+  def findAll(): Iterable[ActionDto] = (DSLContext
+
       select (
         ACTION.ID,
         ACTION.INFO,
@@ -27,14 +21,30 @@ class ActionDao @Autowired() (private val DSLContext: DSLContext){
         ACTION.CREATED_DATE,
         ACTION.INCOME,
 
-        ACTION.CATEGORY_ID
+        CATEGORY.ID,
+        CATEGORY.NAME,
+        CATEGORY.COLOR
       )
-      from ACTION
-    ).fetch(r => {
-      val a = (ActionDto.apply _).tupled
-    })
+      from
+        ACTION
+        join CATEGORY
+          on ACTION.CATEGORY_ID === CATEGORY.ID
+
+    ).fetch(r => ActionDto(
+        id = r.get(ACTION.ID).toLong,
+        info = r.get(ACTION.INFO),
+        summ = r.get(ACTION.SUMM).toDouble,
+        createdDate = r.get(ACTION.CREATED_DATE).toLocalDateTime,
+        category = Category(
+          r.get(CATEGORY.ID).toLong,
+          r.get(CATEGORY.NAME),
+          r.get(CATEGORY.COLOR)
+        ),
+        income = r.get(ACTION.INCOME).booleanValue))
+
+  def save(actionDto: ActionDto): ActionDto = {
+    DSLContext.insertInto(ACTION).columns().values().execute()
   }
 
-  def recordToTuple[T1, T2, T3, T4, T5, T6](r: Record6[T1, T2, T3, T4, T5, T6]): (T1, T2, T3, T4, T5, T6) =
-    (r.component1(), r.component2(), r.component3(), r.component4(), r.component5(), r.component6())
+  private implicit def toScala[T](javaList: java.util.List[T]): Iterable[T] = javaList.asScala
 }
