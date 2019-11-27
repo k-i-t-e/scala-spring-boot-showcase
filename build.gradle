@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '2.1.7.RELEASE'
     id "io.spring.dependency-management" version "1.0.8.RELEASE"
     id 'nu.studer.jooq' version '3.0.3'
+    id "org.flywaydb.flyway" version "6.1.0"
 }
 
 group 'com.kite'
@@ -39,13 +40,19 @@ dependencies {
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.10.1'
 }
 
+flyway {
+    url = 'jdbc:h2:file:./build/wealfy-build'
+    user = 'build'
+    password = 'build'
+}
+
 jooq {
     dao(sourceSets.main) {
         jdbc {
             driver = 'org.h2.Driver'
-            url = 'jdbc:h2:file:./wealfy'
-            user = 'app'
-            password = 'app'
+            url = 'jdbc:h2:file:./build/wealfy-build'
+            user = 'build'
+            password = 'build'
         }
         generator {
             name = 'org.jooq.codegen.DefaultGenerator'
@@ -82,3 +89,6 @@ jooq {
         }
     }
 }
+
+// Generate a sample database using flyway scripts and use it for sources generation
+generateDaoJooqSchemaSource.dependsOn flywayMigrate
